@@ -159,7 +159,8 @@ def get_all_channel_videos(channel_url, content_type):
     if not browse_id:
         return []
     
-    all_videos = initial_videos.copy()
+    # Convert set of video IDs to list of dicts
+    all_videos = [{'video_id': vid} for vid in initial_videos]
     continuation_token = None
     
     # Extract continuation token from initial request
@@ -450,7 +451,9 @@ async def process_channel(session, channel_url):
     
     async def fetch_with_semaphore(video):
         async with semaphore:
-            result = await fetch_video_details(session, video['video_id'])
+            # Handle both string and dict formats
+            video_id = video['video_id'] if isinstance(video, dict) else video
+            result = await fetch_video_details(session, video_id)
             if result:
                 print(".", end="", flush=True)
             return result
