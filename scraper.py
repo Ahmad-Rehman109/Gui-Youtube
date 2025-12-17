@@ -327,20 +327,54 @@ async def fetch_video_details(session, video_id):
                 except:
                     views = 0
             
-            # Likes
+            # Likes - Try multiple methods
             likes = 0
+            
+            # Method 1: Check segmented like button (most common now)
             actions = primary_info.get('videoActions', {}).get('menuRenderer', {}).get('topLevelButtons', [])
             for action in actions:
-                toggle = action.get('toggleButtonRenderer', {})
-                if toggle:
-                    default_text = toggle.get('defaultText', {}).get('accessibility', {}).get('accessibilityData', {}).get('label', '')
-                    if 'like' in default_text.lower():
-                        match = re.search(r'[\d,]+', default_text)
-                        if match:
-                            try:
-                                likes = int(match.group().replace(',', ''))
-                            except:
-                                likes = 0
+                # Check segmentedLikeDislikeButtonRenderer
+                segmented = action.get('segmentedLikeDislikeButtonRenderer', {})
+                if segmented:
+                    like_button = segmented.get('likeButton', {}).get('toggleButtonRenderer', {})
+                    if like_button:
+                        # Check defaultText
+                        default_text = like_button.get('defaultText', {})
+                        accessibility = default_text.get('accessibility', {}).get('accessibilityData', {}).get('label', '')
+                        if accessibility and 'like' in accessibility.lower():
+                            match = re.search(r'([\d,]+)', accessibility)
+                            if match:
+                                try:
+                                    likes = int(match.group(1).replace(',', ''))
+                                    break
+                                except:
+                                    pass
+                        
+                        # Check toggledText
+                        toggled_text = like_button.get('toggledText', {})
+                        accessibility = toggled_text.get('accessibility', {}).get('accessibilityData', {}).get('label', '')
+                        if accessibility and 'like' in accessibility.lower():
+                            match = re.search(r'([\d,]+)', accessibility)
+                            if match:
+                                try:
+                                    likes = int(match.group(1).replace(',', ''))
+                                    break
+                                except:
+                                    pass
+                
+                # Method 2: Old style toggleButtonRenderer
+                if likes == 0:
+                    toggle = action.get('toggleButtonRenderer', {})
+                    if toggle:
+                        default_text = toggle.get('defaultText', {}).get('accessibility', {}).get('accessibilityData', {}).get('label', '')
+                        if 'like' in default_text.lower():
+                            match = re.search(r'([\d,]+)', default_text)
+                            if match:
+                                try:
+                                    likes = int(match.group(1).replace(',', ''))
+                                    break
+                                except:
+                                    pass
             
             # Comments
             comments = 0
