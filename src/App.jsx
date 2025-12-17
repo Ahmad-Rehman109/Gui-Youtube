@@ -8,7 +8,7 @@ const Dashboard = () => {
   const [selectedChannel, setSelectedChannel] = useState('all');
   const [error, setError] = useState(null);
 
-  // UPDATE THIS URL to your GitHub raw JSON URL after deployment
+  // Updated URL to fetch from your GitHub repo
   const DATA_URL = 'https://raw.githubusercontent.com/Ahmad-Rehman109/Gui-Youtube/main/youtube_stats.json';
 
   const fetchData = async () => {
@@ -49,7 +49,7 @@ const Dashboard = () => {
           <h2 className="text-red-400 text-xl font-bold mb-2">Error Loading Data</h2>
           <p className="text-gray-300 mb-4">{error}</p>
           <p className="text-gray-400 text-sm mb-4">
-            Make sure to update DATA_URL in the code with your GitHub raw JSON URL.
+            The scraper will update data every 10 minutes. If this persists, check GitHub Actions.
           </p>
           <button 
             onClick={fetchData}
@@ -123,7 +123,7 @@ const Dashboard = () => {
                 YouTube Analytics Dashboard
               </h1>
               <p className="text-gray-400 text-sm mt-1">
-                Last updated: {new Date(data?.last_updated).toLocaleString()}
+                Last updated: {new Date(data?.last_updated).toLocaleString()} • Auto-updates every 10 min
               </p>
             </div>
             <button 
