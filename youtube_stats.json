@@ -1,12 +1,12 @@
 {
-  "last_updated": "2025-12-17T14:23:00.963567",
-  "total_videos": 14,
+  "last_updated": "2025-12-17T14:25:16.008667",
+  "total_videos": 12,
   "total_channels": 8,
   "videos": [
     {
       "video_id": "O6pFlU6oGiA",
       "title": "बिल्ली डांस | Cutest Cat videos funny dance🤣💃Dance Videos for cats ",
-      "views": 1706,
+      "views": 1635,
       "likes": null,
       "comments": null,
       "duration": null,
@@ -51,7 +51,7 @@
     {
       "video_id": "DpJMVHyyQq4",
       "title": "बिल्ली डांस | Cutest Cat videos funny dance🤣💃Dance Videos for cats ",
-      "views": 500,
+      "views": 501,
       "likes": null,
       "comments": null,
       "duration": null,
@@ -182,36 +182,6 @@
       "channel_url": "https://www.youtube.com/channel/UCvGHUtVqyjNOFSSRN4vLiJQ",
       "video_url": "https://www.youtube.com/watch?v=YauDB2rzyMs",
       "thumbnail": "https://i.ytimg.com/vi/YauDB2rzyMs/hqdefault.jpg"
-    },
-    {
-      "video_id": "JKw-wGOqRCM",
-      "title": "बिल्ली डांस | Cutest Cat videos funny dance🤣💃Dance Videos for cats ",
-      "views": 87,
-      "likes": null,
-      "comments": null,
-      "duration": null,
-      "date_posted": "Dec 11, 2025",
-      "subscribers": 20,
-      "channel_name": "Assasino Mania",
-      "channel_id": "UCkYq8LuoLYTkQMeSjjC7zNQ",
-      "channel_url": "https://www.youtube.com/channel/UCkYq8LuoLYTkQMeSjjC7zNQ",
-      "video_url": "https://www.youtube.com/watch?v=JKw-wGOqRCM",
-      "thumbnail": "https://i.ytimg.com/vi/JKw-wGOqRCM/hqdefault.jpg"
-    },
-    {
-      "video_id": "IpKymrN9SWA",
-      "title": "बिल्ली डांस | Cutest Cat videos funny dance🤣💃Dance Videos for cats ",
-      "views": 178,
-      "likes": null,
-      "comments": null,
-      "duration": null,
-      "date_posted": "Dec 10, 2025",
-      "subscribers": 20,
-      "channel_name": "Assasino Mania",
-      "channel_id": "UCkYq8LuoLYTkQMeSjjC7zNQ",
-      "channel_url": "https://www.youtube.com/channel/UCkYq8LuoLYTkQMeSjjC7zNQ",
-      "video_url": "https://www.youtube.com/watch?v=IpKymrN9SWA",
-      "thumbnail": "https://i.ytimg.com/vi/IpKymrN9SWA/hqdefault.jpg"
     }
   ]
 }
