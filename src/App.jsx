@@ -9,7 +9,7 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
 
   // UPDATE THIS URL to your GitHub raw JSON URL after deployment
-  const DATA_URL = 'https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/youtube_stats.json';
+  const DATA_URL = 'https://raw.githubusercontent.com/Ahmad-Rehman109/Gui-Youtube/main/youtube_stats.json';
 
   const fetchData = async () => {
     setLoading(true);
