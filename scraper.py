@@ -15,14 +15,14 @@ VIDEOS_TO_FETCH = 30
 
 # Your channel URLs
 CHANNELS = [
-    "https://www.youtube.com/@CatMania-01",
-    "https://www.youtube.com/@AssasinoMania",
-    "https://www.youtube.com/@Brainrotassasino-t4u",
-    "https://www.youtube.com/@AhmadRehman-x9l",
-    "https://www.youtube.com/@BrainrotCappucino-f7i",
-    "https://www.youtube.com/@CuteCatDance-u7t",
-    "https://www.youtube.com/@ViralShorts-8888",
-    "https://www.youtube.com/@ForgottenAmerica-01"
+    "https://www.youtube.com/@CatMania-01/videos",
+    "https://www.youtube.com/@CatMania-01/shorts",
+    "https://www.youtube.com/@AssasinoMania/shorts",
+    "https://www.youtube.com/@Brainrotassasino-t4u/shorts",
+    "https://www.youtube.com/@AhmadRehman-x9l/shorts",
+    "https://www.youtube.com/@BrainrotCappucino-f7i/shorts",
+    "https://www.youtube.com/@CuteCatDance-u7t/shorts",
+    "https://www.youtube.com/@ForgottenAmerica-01/videos"
 ]
 
 def get_headers():
