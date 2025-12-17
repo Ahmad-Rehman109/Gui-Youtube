@@ -56,61 +56,101 @@ def extract_browse_id_and_videos(channel_url, content_type):
         
         if not browse_id:
             print(f"  ❌ Could not find browseId for {channel_url}")
-            return None, []
+            return None, set()
         
         print(f"  ✓ Found browseId: {browse_id}")
         
-        # Extract initial data from HTML
-        videos = []
+        # Extract initial data from HTML - use set to track unique IDs
+        video_ids = set()
+        
+        # Try to find ytInitialData
         match = re.search(r'var ytInitialData = ({.*?});', html)
         if match:
             try:
                 initial_data = json.loads(match.group(1))
                 videos = extract_videos_from_data(initial_data)
-                print(f"  ✓ Extracted {len(videos)} videos from HTML")
-            except:
-                pass
+                video_ids = {v['video_id'] for v in videos}
+                print(f"  ✓ Extracted {len(video_ids)} unique videos from HTML")
+            except Exception as e:
+                print(f"  ⚠ Error parsing ytInitialData: {e}")
         
-        return browse_id, videos
+        # For shorts, also try to extract video IDs directly from HTML as backup
+        if content_type == 'shorts' and len(video_ids) == 0:
+            # Look for video IDs in various formats
+            video_id_patterns = [
+                r'"videoId":"([a-zA-Z0-9_-]{11})"',
+                r'"contentId":"([a-zA-Z0-9_-]{11})"',
+                r'/shorts/([a-zA-Z0-9_-]{11})',
+            ]
+            
+            for pattern in video_id_patterns:
+                matches = re.findall(pattern, html)
+                video_ids.update(matches)
+            
+            if len(video_ids) > 0:
+                print(f"  ✓ Found {len(video_ids)} shorts via regex patterns")
+        
+        return browse_id, video_ids
         
     except Exception as e:
         print(f"  ❌ Error fetching channel page: {e}")
-        return None, []
+        return None, set()
 
 def extract_videos_from_data(data):
     """Extract video IDs from YouTube data structure"""
-    videos = []
+    video_ids = set()  # Use set to avoid duplicates
     
-    def search_dict(obj):
+    def search_dict(obj, depth=0):
+        if depth > 20:  # Prevent infinite recursion
+            return
+            
         if isinstance(obj, dict):
             # Check for videoRenderer
             if 'videoRenderer' in obj:
                 video_id = obj['videoRenderer'].get('videoId')
                 if video_id:
-                    videos.append({'video_id': video_id})
+                    video_ids.add(video_id)
+                    return  # Don't recurse into this object
+            
             # Check for reelItemRenderer (shorts)
-            elif 'reelItemRenderer' in obj:
+            if 'reelItemRenderer' in obj:
                 video_id = obj['reelItemRenderer'].get('videoId')
                 if video_id:
-                    videos.append({'video_id': video_id})
+                    video_ids.add(video_id)
+                    return  # Don't recurse into this object
+            
             # Check for richItemRenderer
-            elif 'richItemRenderer' in obj:
+            if 'richItemRenderer' in obj:
                 content = obj['richItemRenderer'].get('content', {})
+                
+                # Check for video renderer
                 video_renderer = content.get('videoRenderer', {})
-                if video_renderer:
-                    video_id = video_renderer.get('videoId')
-                    if video_id:
-                        videos.append({'video_id': video_id})
+                if video_renderer and video_renderer.get('videoId'):
+                    video_ids.add(video_renderer['videoId'])
+                    return
+                
+                # Check for reel renderer (shorts)
+                reel_renderer = content.get('reelItemRenderer', {})
+                if reel_renderer and reel_renderer.get('videoId'):
+                    video_ids.add(reel_renderer['videoId'])
+                    return
+            
+            # Check for lockupViewModel (new shorts format)
+            if 'lockupViewModel' in obj:
+                content_id = obj['lockupViewModel'].get('contentId')
+                if content_id:
+                    video_ids.add(content_id)
+                    return
             
             # Recurse through all dict values
             for value in obj.values():
-                search_dict(value)
+                search_dict(value, depth + 1)
         elif isinstance(obj, list):
             for item in obj:
-                search_dict(item)
+                search_dict(item, depth + 1)
     
     search_dict(data)
-    return videos
+    return [{'video_id': vid} for vid in video_ids]
 
 def get_all_channel_videos(channel_url, content_type):
     """Get ALL video IDs from a channel using pagination"""
