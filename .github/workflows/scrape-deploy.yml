@@ -23,6 +23,8 @@ jobs:
     # Step 1: Checkout repository
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history for proper git operations
       
     # Step 2: Set up Python for scraping
     - name: Set up Python
@@ -42,11 +44,13 @@ jobs:
       
     # Step 5: Commit and push updated data
     - name: Commit and push changes
-      run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git add youtube_stats.json
-        git diff --quiet && git diff --staged --quiet || (git commit -m "📊 Update YouTube stats - $(date)" && git push)
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "📊 Update YouTube stats - $(date)"
+        file_pattern: 'youtube_stats.json'
+        commit_user_name: github-actions[bot]
+        commit_user_email: github-actions[bot]@users.noreply.github.com
+        commit_author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
       
     # Step 6: Set up Node.js for building
     - name: Setup Node.js
@@ -68,7 +72,7 @@ jobs:
       with:
         apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        projectName: youtube-stats-dashboard
+        projectName: youtube-stats-dashboard  # Change this to your existing project name
         directory: dist
         gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           
