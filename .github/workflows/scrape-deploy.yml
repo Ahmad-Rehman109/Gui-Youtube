@@ -53,11 +53,10 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '18'
-        cache: 'npm'
           
     # Step 7: Install Node dependencies
     - name: Install Node dependencies
-      run: npm ci
+      run: npm install
         
     # Step 8: Build React app
     - name: Build React app
