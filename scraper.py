@@ -21,7 +21,6 @@ CHANNELS = [
     "https://www.youtube.com/@Brainrotassasino-t4u/shorts",
     "https://www.youtube.com/@AhmadRehman-x9l/shorts",
     "https://www.youtube.com/@BrainrotCappucino-f7i/shorts",
-    "https://www.youtube.com/@CuteCatDance-u7t/shorts",
     "https://www.youtube.com/@ForgottenAmerica-01/shorts",
     "https://www.youtube.com/@ForgottenAmerica-01/videos",
     "https://www.youtube.com/@FunnyChintu-v2e/shorts",
@@ -29,7 +28,8 @@ CHANNELS = [
     "https://www.youtube.com/@BrainRotCore-s9c/shorts",
     "https://www.youtube.com/@BrainRotEngine-k6z/shorts",
     "https://www.youtube.com/@BrainRotFramework/shorts",
-    "https://www.youtube.com/@ForgottenAmerica-y9d/videos"
+    "https://www.youtube.com/@ForgottenAmerica-y9d/videos",
+    "https://www.youtube.com/channel/UCru2u6pEUvWHmpmbSd82DeQ/"
 ]
 
 def get_headers():
