@@ -29,7 +29,9 @@ CHANNELS = [
     "https://www.youtube.com/@BrainRotEngine-k6z/shorts",
     "https://www.youtube.com/@BrainRotFramework/shorts",
     "https://www.youtube.com/@ForgottenAmerica-y9d/videos",
-    "https://www.youtube.com/channel/UCru2u6pEUvWHmpmbSd82DeQ/"
+    "https://www.youtube.com/channel/UCru2u6pEUvWHmpmbSd82DeQ/shorts",
+    "youtube.com/channel/UCKY8O9ccaSoD3oCSlapNo-g/shorts",
+    
 ]
 
 def get_headers():
