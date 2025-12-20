@@ -30,7 +30,7 @@ CHANNELS = [
     "https://www.youtube.com/@BrainRotFramework/shorts",
     "https://www.youtube.com/@ForgottenAmerica-y9d/videos",
     "https://www.youtube.com/@CuteCatDance-u7t/shorts",
-    "youtube.com/channel/UCKY8O9ccaSoD3oCSlapNo-g/shorts",
+    "https://www.youtube.com/@BrainrotCrocodilo/shorts",
     
 ]
 
