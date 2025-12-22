@@ -344,7 +344,7 @@ const Dashboard = () => {
             <h2 className="text-xl font-bold text-white mb-4">🔥 Top 5 Performing Videos</h2>
             <div className="space-y-3">
               {topVideos.map((video, idx) => (
-                
+  
                   key={video.video_id}
                   href={video.video_url}
                   target="_blank"
@@ -479,7 +479,7 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="space-y-3">
             {sortedVideos.map((video, idx) => (
-              
+  
                 key={`${video.video_id}-${idx}`}
                 href={video.video_url}
                 target="_blank"
@@ -641,7 +641,7 @@ const Dashboard = () => {
             <h2 className="text-xl font-bold text-white mb-4">All Videos from {selectedChannel}</h2>
             <div className="space-y-3">
               {sortedChannelVideos.map((video, idx) => (
-                
+  
                   key={`${video.video_id}-${idx}`}
                   href={video.video_url}
                   target="_blank"
