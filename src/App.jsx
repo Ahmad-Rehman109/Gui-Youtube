@@ -156,8 +156,52 @@ const Dashboard = () => {
     }));
   };
 
+  // Generate all channels combined 30-day view data
+  const getAllChannels30DayData = () => {
+    const dayData = {};
+    
+    // Initialize 30 days
+    for (let i = 0; i < 30; i++) {
+      dayData[i] = { day: i, views: 0, videos: 0, likes: 0 };
+    }
+    
+    // Aggregate data by day
+    videos.forEach(video => {
+      const daysAgo = getDaysAgo(video.date_posted);
+      if (daysAgo !== null && daysAgo < 30) {
+        dayData[daysAgo].views += video.views || 0;
+        dayData[daysAgo].videos += 1;
+        dayData[daysAgo].likes += video.likes || 0;
+      }
+    });
+    
+    // Convert to array and reverse (oldest to newest)
+    return Object.values(dayData).reverse().map((d, idx) => ({
+      day: `Day ${idx + 1}`,
+      views: d.views,
+      videos: d.videos,
+      likes: d.likes
+    }));
+  };
+
+  // Calculate engagement rate
+  const engagementRate = totalViews > 0 ? ((totalLikes / totalViews) * 100).toFixed(2) : 0;
+  
+  // Get top 5 performing videos
+  const topVideos = [...videos].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
+  
+  // Calculate last 7 days stats
+  const last7DaysVideos = videos.filter(v => {
+    const daysAgo = getDaysAgo(v.date_posted);
+    return daysAgo !== null && daysAgo < 7;
+  });
+  const last7DaysViews = last7DaysVideos.reduce((sum, v) => sum + (v.views || 0), 0);
+  const last7DaysLikes = last7DaysVideos.reduce((sum, v) => sum + (v.likes || 0), 0);
+
   // Overview Page
   if (view === 'overview') {
+    const allChannelsData = getAllChannels30DayData();
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <div className="bg-gray-800/50 border-b border-gray-700 sticky top-0 z-10 backdrop-blur-sm">
@@ -219,6 +263,7 @@ const Dashboard = () => {
                 <span className="text-sm font-medium">Total Videos</span>
               </div>
               <div className="text-2xl font-bold text-white">{videos.length}</div>
+              <p className="text-xs text-gray-400 mt-1">{last7DaysVideos.length} in last 7 days</p>
             </div>
 
             <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 border border-purple-500/30 rounded-lg p-4">
@@ -227,6 +272,7 @@ const Dashboard = () => {
                 <span className="text-sm font-medium">Total Views</span>
               </div>
               <div className="text-2xl font-bold text-white">{formatNumber(totalViews)}</div>
+              <p className="text-xs text-gray-400 mt-1">{formatNumber(last7DaysViews)} in last 7 days</p>
             </div>
 
             <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 border border-green-500/30 rounded-lg p-4">
@@ -235,20 +281,113 @@ const Dashboard = () => {
                 <span className="text-sm font-medium">Total Likes</span>
               </div>
               <div className="text-2xl font-bold text-white">{formatNumber(totalLikes)}</div>
+              <p className="text-xs text-gray-400 mt-1">{formatNumber(last7DaysLikes)} in last 7 days</p>
             </div>
 
             <div className="bg-gradient-to-br from-red-500/20 to-red-600/20 border border-red-500/30 rounded-lg p-4">
               <div className="flex items-center gap-2 text-red-400 mb-2">
                 <TrendingUp size={20} />
-                <span className="text-sm font-medium">Avg Views</span>
+                <span className="text-sm font-medium">Engagement Rate</span>
               </div>
-              <div className="text-2xl font-bold text-white">{formatNumber(avgViews)}</div>
+              <div className="text-2xl font-bold text-white">{engagementRate}%</div>
+              <p className="text-xs text-gray-400 mt-1">Likes/Views ratio</p>
+            </div>
+          </div>
+
+          {/* 30-Day Views Trend - All Channels */}
+          <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 mb-6">
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <Calendar className="text-blue-400" />
+              Views & Uploads Over Last 30 Days (All Channels)
+            </h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={allChannelsData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis 
+                  dataKey="day" 
+                  stroke="#9CA3AF"
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                />
+                <YAxis yAxisId="left" stroke="#9CA3AF" />
+                <YAxis yAxisId="right" orientation="right" stroke="#9CA3AF" />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151' }}
+                  labelStyle={{ color: '#F3F4F6' }}
+                />
+                <Legend />
+                <Line 
+                  yAxisId="left"
+                  type="monotone" 
+                  dataKey="views" 
+                  stroke="#8B5CF6" 
+                  strokeWidth={3}
+                  name="Views"
+                  dot={{ fill: '#8B5CF6', r: 4 }}
+                />
+                <Line 
+                  yAxisId="right"
+                  type="monotone" 
+                  dataKey="videos" 
+                  stroke="#10B981" 
+                  strokeWidth={2}
+                  name="Videos Posted"
+                  dot={{ fill: '#10B981', r: 3 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Top Performing Videos */}
+          <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 mb-6">
+            <h2 className="text-xl font-bold text-white mb-4">🔥 Top 5 Performing Videos</h2>
+            <div className="space-y-3">
+              {topVideos.map((video, idx) => (
+                
+                  key={video.video_id}
+                  href={video.video_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-gray-700/30 hover:bg-gray-700/50 border border-gray-600 rounded-lg p-4 transition-colors"
+                >
+                  <div className="flex gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center font-bold text-gray-900">
+                        {idx + 1}
+                      </div>
+                    </div>
+                    <img 
+                      src={video.thumbnail} 
+                      alt={video.title}
+                      className="w-32 h-20 object-cover rounded flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-white font-medium line-clamp-1 mb-1">{video.title}</h3>
+                      <p className="text-purple-400 text-sm mb-2">{video.channel_name}</p>
+                      <div className="flex flex-wrap gap-3 text-sm">
+                        <span className="text-blue-400 flex items-center gap-1">
+                          <Eye size={14} />
+                          {formatNumber(video.views)}
+                        </span>
+                        <span className="text-green-400 flex items-center gap-1">
+                          <ThumbsUp size={14} />
+                          {formatNumber(video.likes)}
+                        </span>
+                        <span className="text-gray-400 text-xs">
+                          {formatDate(video.date_posted)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              ))}
             </div>
           </div>
 
           {/* Channel Performance Chart */}
           <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 mb-6">
-            <h2 className="text-xl font-bold text-white mb-4">Channel Performance</h2>
+            <h2 className="text-xl font-bold text-white mb-4">Channel Performance Comparison</h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={channelStats}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -273,26 +412,30 @@ const Dashboard = () => {
 
           {/* Channel Cards */}
           <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
-            <h2 className="text-xl font-bold text-white mb-4">Channels</h2>
+            <h2 className="text-xl font-bold text-white mb-4">Channels Overview</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {channelStats.map((channel) => (
-                <button
-                  key={channel.name}
-                  onClick={() => {
-                    setSelectedChannel(channel.name);
-                    setView('channel-detail');
-                  }}
-                  className="bg-gray-700/30 hover:bg-gray-700/50 border border-gray-600 rounded-lg p-4 text-left transition-colors"
-                >
-                  <h3 className="text-white font-bold mb-2">{channel.name}</h3>
-                  <div className="space-y-1 text-sm">
-                    <p className="text-gray-400">Videos: <span className="text-white">{channel.videos}</span></p>
-                    <p className="text-gray-400">Subscribers: <span className="text-purple-400">{formatNumber(channel.subscribers)}</span></p>
-                    <p className="text-gray-400">Total Views: <span className="text-blue-400">{formatNumber(channel.views)}</span></p>
-                    <p className="text-gray-400">Avg Views: <span className="text-green-400">{formatNumber(channel.avgViews)}</span></p>
-                  </div>
-                </button>
-              ))}
+              {channelStats.map((channel) => {
+                const channelEngagement = channel.views > 0 ? ((channel.likes / channel.views) * 100).toFixed(2) : 0;
+                return (
+                  <button
+                    key={channel.name}
+                    onClick={() => {
+                      setSelectedChannel(channel.name);
+                      setView('channel-detail');
+                    }}
+                    className="bg-gray-700/30 hover:bg-gray-700/50 border border-gray-600 rounded-lg p-4 text-left transition-colors"
+                  >
+                    <h3 className="text-white font-bold mb-2 line-clamp-1">{channel.name}</h3>
+                    <div className="space-y-1 text-sm">
+                      <p className="text-gray-400">Videos: <span className="text-white">{channel.videos}</span></p>
+                      <p className="text-gray-400">Subscribers: <span className="text-purple-400">{formatNumber(channel.subscribers)}</span></p>
+                      <p className="text-gray-400">Total Views: <span className="text-blue-400">{formatNumber(channel.views)}</span></p>
+                      <p className="text-gray-400">Avg Views: <span className="text-green-400">{formatNumber(channel.avgViews)}</span></p>
+                      <p className="text-gray-400">Engagement: <span className="text-yellow-400">{channelEngagement}%</span></p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -336,7 +479,7 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="space-y-3">
             {sortedVideos.map((video, idx) => (
-              <a
+              
                 key={`${video.video_id}-${idx}`}
                 href={video.video_url}
                 target="_blank"
@@ -405,7 +548,7 @@ const Dashboard = () => {
                 </button>
                 <div>
                   <h1 className="text-2xl font-bold text-white">{selectedChannel}</h1>
-                  <p className="text-gray-400 text-sm">{channelInfo?.subscribers} subscribers • {channelVideos.length} videos</p>
+                  <p className="text-gray-400 text-sm">{formatNumber(channelInfo?.subscribers)} subscribers • {channelVideos.length} videos</p>
                 </div>
               </div>
               <div className="flex gap-2">
@@ -498,7 +641,7 @@ const Dashboard = () => {
             <h2 className="text-xl font-bold text-white mb-4">All Videos from {selectedChannel}</h2>
             <div className="space-y-3">
               {sortedChannelVideos.map((video, idx) => (
-                <a
+                
                   key={`${video.video_id}-${idx}`}
                   href={video.video_url}
                   target="_blank"
