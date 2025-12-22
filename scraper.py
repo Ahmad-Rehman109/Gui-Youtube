@@ -11,7 +11,7 @@ from datetime import datetime
 YOUTUBE_KEY = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
 CLIENT_VERSION = "2.20251125.06.00"
 CONCURRENT_VIDEOS_PER_CHANNEL = 20
-MAX_VIDEOS_PER_CHANNEL = 100  # Get all videos until no more found
+MAX_VIDEOS_PER_CHANNEL = 100
 
 # Your channel URLs
 CHANNELS = [
@@ -22,7 +22,6 @@ CHANNELS = [
     "https://www.youtube.com/@AhmadRehman-x9l/shorts",
     "https://www.youtube.com/@BrainrotCappucino-f7i/shorts",
     "https://www.youtube.com/@ForgottenAmerica-01/shorts",
-    "https://www.youtube.com/@FunnyChintu-v2e/shorts",
     "https://www.youtube.com/@BrainRotDiaries-A/shorts",
     "https://www.youtube.com/@BrainRotCore-s9c/shorts",
     "https://www.youtube.com/@BrainRotEngine-k6z/shorts",
@@ -32,7 +31,6 @@ CHANNELS = [
     "https://www.youtube.com/@BrainrotBlue/shorts",
     "https://www.youtube.com/@ForgottenAmerica-01/videos",
     "https://www.youtube.com/@BrainRotKnowledge-s9s/shorts"
-    
 ]
 
 def get_headers():
@@ -46,6 +44,55 @@ def get_headers():
         'x-youtube-client-name': '1',
         'x-youtube-client-version': CLIENT_VERSION
     }
+
+def collect_all_text_from_runs(obj):
+    """Collect text from YouTube's 'runs' structure"""
+    if not obj:
+        return ""
+    
+    if isinstance(obj, str):
+        return obj
+    
+    if isinstance(obj, dict):
+        # Check for simpleText
+        if 'simpleText' in obj:
+            return obj['simpleText']
+        
+        # Check for runs
+        if 'runs' in obj:
+            runs = obj['runs']
+            if isinstance(runs, list):
+                return ''.join(run.get('text', '') for run in runs if isinstance(run, dict))
+    
+    return ""
+
+def convert_abbrev_to_int(text):
+    """Convert abbreviated numbers like '1.2K', '5M' to integers"""
+    if not text:
+        return None
+    
+    # Extract number and suffix
+    match = re.search(r'([\d,.]+)\s*([KMB])?', str(text), re.IGNORECASE)
+    if not match:
+        return None
+    
+    try:
+        num_str = match.group(1).replace(',', '')
+        num = float(num_str)
+        suffix = match.group(2)
+        
+        if suffix:
+            suffix = suffix.upper()
+            if suffix == 'K':
+                num *= 1000
+            elif suffix == 'M':
+                num *= 1000000
+            elif suffix == 'B':
+                num *= 1000000000
+        
+        return int(num)
+    except:
+        return None
 
 def extract_browse_id_and_videos(channel_url, content_type):
     """Extract browseId and initial videos from channel page HTML"""
@@ -70,10 +117,9 @@ def extract_browse_id_and_videos(channel_url, content_type):
         
         print(f"  ✓ Found browseId: {browse_id}")
         
-        # Extract initial data from HTML - use set to track unique IDs
+        # Extract initial data from HTML
         video_ids = set()
         
-        # Try to find ytInitialData
         match = re.search(r'var ytInitialData = ({.*?});', html)
         if match:
             try:
@@ -84,9 +130,7 @@ def extract_browse_id_and_videos(channel_url, content_type):
             except Exception as e:
                 print(f"  ⚠ Error parsing ytInitialData: {e}")
         
-        # For shorts, also try to extract video IDs directly from HTML as backup
         if content_type == 'shorts' and len(video_ids) == 0:
-            # Look for video IDs in various formats
             video_id_patterns = [
                 r'"videoId":"([a-zA-Z0-9_-]{11})"',
                 r'"contentId":"([a-zA-Z0-9_-]{11})"',
@@ -108,51 +152,44 @@ def extract_browse_id_and_videos(channel_url, content_type):
 
 def extract_videos_from_data(data):
     """Extract video IDs from YouTube data structure"""
-    video_ids = set()  # Use set to avoid duplicates
+    video_ids = set()
     
     def search_dict(obj, depth=0):
-        if depth > 20:  # Prevent infinite recursion
+        if depth > 20:
             return
             
         if isinstance(obj, dict):
-            # Check for videoRenderer
             if 'videoRenderer' in obj:
                 video_id = obj['videoRenderer'].get('videoId')
                 if video_id:
                     video_ids.add(video_id)
-                    return  # Don't recurse into this object
+                    return
             
-            # Check for reelItemRenderer (shorts)
             if 'reelItemRenderer' in obj:
                 video_id = obj['reelItemRenderer'].get('videoId')
                 if video_id:
                     video_ids.add(video_id)
-                    return  # Don't recurse into this object
+                    return
             
-            # Check for richItemRenderer
             if 'richItemRenderer' in obj:
                 content = obj['richItemRenderer'].get('content', {})
                 
-                # Check for video renderer
                 video_renderer = content.get('videoRenderer', {})
                 if video_renderer and video_renderer.get('videoId'):
                     video_ids.add(video_renderer['videoId'])
                     return
                 
-                # Check for reel renderer (shorts)
                 reel_renderer = content.get('reelItemRenderer', {})
                 if reel_renderer and reel_renderer.get('videoId'):
                     video_ids.add(reel_renderer['videoId'])
                     return
             
-            # Check for lockupViewModel (new shorts format)
             if 'lockupViewModel' in obj:
                 content_id = obj['lockupViewModel'].get('contentId')
                 if content_id:
                     video_ids.add(content_id)
                     return
             
-            # Recurse through all dict values
             for value in obj.values():
                 search_dict(value, depth + 1)
         elif isinstance(obj, list):
@@ -169,15 +206,12 @@ def get_all_channel_videos(channel_url, content_type):
     if not browse_id:
         return []
     
-    # Convert set of video IDs to list of dicts
     all_videos = [{'video_id': vid} for vid in initial_videos]
     continuation_token = None
     
-    # Extract continuation token from initial request
     params = "EgZ2aWRlb3PyBgQKAjoA" if content_type == 'videos' else "EgZzaG9ydHPyBgUKA5oBAA%3D%3D"
     
     try:
-        # First API call to get continuation token
         payload = {
             "context": {
                 "client": {
@@ -202,7 +236,6 @@ def get_all_channel_videos(channel_url, content_type):
             data = response.json()
             new_videos = extract_videos_from_data(data)
             
-            # Add new videos (avoid duplicates)
             existing_ids = {v['video_id'] for v in all_videos}
             for video in new_videos:
                 if video['video_id'] not in existing_ids:
@@ -211,7 +244,6 @@ def get_all_channel_videos(channel_url, content_type):
             
             print(f"  ✓ Total videos so far: {len(all_videos)}")
         
-        # Get continuation token for pagination
         def find_continuation(obj):
             if isinstance(obj, dict):
                 if 'continuationCommand' in obj:
@@ -229,7 +261,6 @@ def get_all_channel_videos(channel_url, content_type):
         
         continuation_token = find_continuation(data) if response.ok else None
         
-        # Paginate through remaining videos
         page = 2
         while continuation_token and len(all_videos) < MAX_VIDEOS_PER_CHANNEL:
             print(f"  → Fetching page {page}...")
@@ -261,7 +292,6 @@ def get_all_channel_videos(channel_url, content_type):
                 if not new_videos:
                     break
                 
-                # Add new videos
                 existing_ids = {v['video_id'] for v in all_videos}
                 added = 0
                 for video in new_videos:
@@ -275,11 +305,10 @@ def get_all_channel_videos(channel_url, content_type):
                 if added == 0:
                     break
                 
-                # Get next continuation token
                 continuation_token = find_continuation(data)
                 page += 1
                 
-                time.sleep(0.5)  # Rate limiting
+                time.sleep(0.5)
                 
             except Exception as e:
                 print(f"  ⚠ Pagination error: {e}")
@@ -312,6 +341,25 @@ async def fetch_video_details(session, video_id):
                 
             data = await resp.json()
             
+            # Extract engagement panels
+            engagement_panels = data.get("engagementPanels", [])
+            video_desc_header = None
+            
+            for panel in engagement_panels:
+                if isinstance(panel, dict):
+                    section_list = panel.get("engagementPanelSectionListRenderer", {})
+                    if section_list:
+                        content = section_list.get("content", {})
+                        structured_desc = content.get("structuredDescriptionContentRenderer", {})
+                        if structured_desc:
+                            items = structured_desc.get("items", [])
+                            for item in items:
+                                if "videoDescriptionHeaderRenderer" in item:
+                                    video_desc_header = item["videoDescriptionHeaderRenderer"]
+                                    break
+                            if video_desc_header:
+                                break
+            
             # Extract video details
             results = data.get('contents', {}).get('twoColumnWatchNextResults', {}).get('results', {}).get('results', {}).get('contents', [])
             
@@ -323,116 +371,83 @@ async def fetch_video_details(session, video_id):
             
             # Title
             title = None
-            title_runs = primary_info.get('title', {}).get('runs', [])
-            if title_runs:
-                title = title_runs[0].get('text')
+            title_runs = primary_info.get('title', {})
+            title = collect_all_text_from_runs(title_runs)
             
             # Views
             views = 0
             view_count = primary_info.get('viewCount', {}).get('videoViewCountRenderer', {}).get('viewCount', {})
-            view_text = view_count.get('simpleText', '')
+            view_text = collect_all_text_from_runs(view_count)
             if view_text:
-                try:
-                    views = int(re.sub(r'[^\d]', '', view_text.split()[0]))
-                except:
-                    views = 0
+                views = convert_abbrev_to_int(view_text) or 0
             
-            # Likes - Try multiple methods
+            # Likes - WORKING EXTRACTION METHOD
             likes = 0
-            
-            # Method 1: Check segmented like button (most common now)
-            actions = primary_info.get('videoActions', {}).get('menuRenderer', {}).get('topLevelButtons', [])
-            for action in actions:
-                # Check segmentedLikeDislikeButtonRenderer
-                segmented = action.get('segmentedLikeDislikeButtonRenderer', {})
-                if segmented:
-                    like_button = segmented.get('likeButton', {}).get('toggleButtonRenderer', {})
-                    if like_button:
-                        # Check defaultText
-                        default_text = like_button.get('defaultText', {})
-                        accessibility = default_text.get('accessibility', {}).get('accessibilityData', {}).get('label', '')
-                        if accessibility and 'like' in accessibility.lower():
-                            match = re.search(r'([\d,]+)', accessibility)
-                            if match:
-                                try:
-                                    likes = int(match.group(1).replace(',', ''))
-                                    break
-                                except:
-                                    pass
-                        
-                        # Check toggledText
-                        toggled_text = like_button.get('toggledText', {})
-                        accessibility = toggled_text.get('accessibility', {}).get('accessibilityData', {}).get('label', '')
-                        if accessibility and 'like' in accessibility.lower():
-                            match = re.search(r'([\d,]+)', accessibility)
-                            if match:
-                                try:
-                                    likes = int(match.group(1).replace(',', ''))
-                                    break
-                                except:
-                                    pass
+            try:
+                # Method 1: Try from video description header factoids (most reliable)
+                if video_desc_header:
+                    factoids = video_desc_header.get("factoid", [])
+                    for factoid in factoids:
+                        if isinstance(factoid, dict):
+                            factoid_renderer = factoid.get("factoidRenderer")
+                            if factoid_renderer:
+                                label = factoid_renderer.get("label", {})
+                                label_text = collect_all_text_from_runs(label).lower()
+                                
+                                if "like" in label_text:
+                                    value = factoid_renderer.get("value", {})
+                                    value_text = collect_all_text_from_runs(value)
+                                    if value_text:
+                                        likes = convert_abbrev_to_int(value_text) or 0
+                                        if likes > 0:
+                                            break
                 
-                # Method 2: Old style toggleButtonRenderer
+                # Method 2: Fallback to toggle button
                 if likes == 0:
-                    toggle = action.get('toggleButtonRenderer', {})
-                    if toggle:
-                        default_text = toggle.get('defaultText', {}).get('accessibility', {}).get('accessibilityData', {}).get('label', '')
-                        if 'like' in default_text.lower():
-                            match = re.search(r'([\d,]+)', default_text)
-                            if match:
-                                try:
-                                    likes = int(match.group(1).replace(',', ''))
-                                    break
-                                except:
-                                    pass
+                    actions = primary_info.get("videoActions", {}).get("menuRenderer", {}).get("topLevelButtons", [])
+                    for action in actions:
+                        if isinstance(action, dict):
+                            toggle_button = action.get("toggleButtonRenderer", {})
+                            if toggle_button:
+                                default_text = toggle_button.get("defaultText", {})
+                                accessibility = default_text.get("accessibility", {})
+                                if accessibility:
+                                    access_data = accessibility.get("accessibilityData", {})
+                                    label = access_data.get("label", "")
+                                    if "like" in label.lower():
+                                        likes = convert_abbrev_to_int(label) or 0
+                                        if likes > 0:
+                                            break
+            except Exception as e:
+                print(f"  ⚠ Error extracting likes for {video_id}: {str(e)}")
+                likes = 0
             
             # Comments
             comments = 0
-            engagement = data.get('engagementPanels', [])
-            for panel in engagement:
-                panel_renderer = panel.get('engagementPanelSectionListRenderer', {})
-                if 'comments' in panel_renderer.get('panelIdentifier', '').lower():
-                    header = panel_renderer.get('header', {}).get('engagementPanelTitleHeaderRenderer', {})
-                    contextual = header.get('contextualInfo', {})
-                    if contextual:
-                        runs = contextual.get('runs', [])
-                        if runs:
-                            comment_text = runs[0].get('text', '')
-                            match = re.search(r'[\d,]+', comment_text)
-                            if match:
-                                try:
-                                    comments = int(match.group().replace(',', ''))
-                                except:
-                                    comments = 0
+            for panel in engagement_panels:
+                if isinstance(panel, dict):
+                    panel_renderer = panel.get('engagementPanelSectionListRenderer', {})
+                    if 'comments' in panel_renderer.get('panelIdentifier', '').lower():
+                        header = panel_renderer.get('header', {}).get('engagementPanelTitleHeaderRenderer', {})
+                        contextual = header.get('contextualInfo', {})
+                        comment_text = collect_all_text_from_runs(contextual)
+                        if comment_text:
+                            comments = convert_abbrev_to_int(comment_text) or 0
             
             # Channel info
             channel_name = None
             owner = secondary_info.get('owner', {}).get('videoOwnerRenderer', {})
-            channel_title = owner.get('title', {}).get('runs', [])
-            if channel_title:
-                channel_name = channel_title[0].get('text')
+            channel_title = owner.get('title', {})
+            channel_name = collect_all_text_from_runs(channel_title)
             
             channel_id = owner.get('navigationEndpoint', {}).get('browseEndpoint', {}).get('browseId')
             
             # Subscribers
             subscribers = 0
-            sub_text = owner.get('subscriberCountText', {}).get('simpleText', '')
-            if sub_text:
-                match = re.search(r'([\d.]+)([KMB])?', sub_text)
-                if match:
-                    try:
-                        num = float(match.group(1))
-                        suffix = match.group(2)
-                        if suffix == 'K':
-                            subscribers = int(num * 1000)
-                        elif suffix == 'M':
-                            subscribers = int(num * 1000000)
-                        elif suffix == 'B':
-                            subscribers = int(num * 1000000000)
-                        else:
-                            subscribers = int(num)
-                    except:
-                        subscribers = 0
+            sub_text = owner.get('subscriberCountText', {})
+            sub_str = collect_all_text_from_runs(sub_text)
+            if sub_str:
+                subscribers = convert_abbrev_to_int(sub_str) or 0
             
             # Date
             date_posted = primary_info.get('dateText', {}).get('simpleText', 'Unknown')
@@ -490,12 +505,11 @@ async def process_channel(session, channel_url):
     
     print(f"\n  🎬 Fetching details for {len(video_list)} videos...")
     
-    # Step 2: Fetch details concurrently (20 at a time)
+    # Step 2: Fetch details concurrently
     semaphore = asyncio.Semaphore(CONCURRENT_VIDEOS_PER_CHANNEL)
     
     async def fetch_with_semaphore(video):
         async with semaphore:
-            # Handle both string and dict formats
             video_id = video['video_id'] if isinstance(video, dict) else video
             result = await fetch_video_details(session, video_id)
             if result:
@@ -505,9 +519,8 @@ async def process_channel(session, channel_url):
     tasks = [fetch_with_semaphore(video) for video in video_list]
     results = await asyncio.gather(*tasks)
     
-    print()  # New line after dots
+    print()
     
-    # Filter out None results
     valid_results = [r for r in results if r is not None]
     print(f"  ✅ Successfully fetched {len(valid_results)}/{len(video_list)} videos")
     
@@ -528,11 +541,9 @@ async def scrape_all_channels():
     timeout = aiohttp.ClientTimeout(total=120, connect=30)
     
     async with aiohttp.ClientSession(headers=headers, connector=connector, timeout=timeout) as session:
-        # Process all channels concurrently
         tasks = [process_channel(session, channel) for channel in CHANNELS]
         all_results = await asyncio.gather(*tasks)
     
-    # Flatten results
     all_videos = []
     for channel_results in all_results:
         all_videos.extend(channel_results)
