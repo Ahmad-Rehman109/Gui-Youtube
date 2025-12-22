@@ -344,7 +344,7 @@ const Dashboard = () => {
             <h2 className="text-xl font-bold text-white mb-4">🔥 Top 5 Performing Videos</h2>
             <div className="space-y-3">
               {topVideos.map((video, idx) => (
-  
+                  <a
                   key={video.video_id}
                   href={video.video_url}
                   target="_blank"
