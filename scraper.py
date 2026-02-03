@@ -19,7 +19,7 @@ CHANNELS = [
     "https://www.youtube.com/@MehulInsights/videos",
     "https://www.youtube.com/@AdityaThoughtss/videos",
     "https://www.youtube.com/@SwapnilLearn/videos",
-    "https://www.youtube.com/@AmanThoughts/videos",
+    "https://www.youtube.com/@AmanThoughtss/videos",
     "https://www.youtube.com/@DeepaakSpeaks/videos",
     "https://www.youtube.com/@RitwikWrites/videos",
     "https://www.youtube.com/@AnupamThoughts/videos",
