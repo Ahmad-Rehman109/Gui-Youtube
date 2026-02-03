@@ -15,22 +15,22 @@ MAX_VIDEOS_PER_CHANNEL = 100
 
 # Your channel URLs
 CHANNELS = [
-    "https://www.youtube.com/@CatMania-01/videos",
-    "https://www.youtube.com/@CatMania-01/shorts",
-    "https://www.youtube.com/@AssasinoMania/shorts",
-    "https://www.youtube.com/@Brainrotassasino-t4u/shorts",
-    "https://www.youtube.com/@AhmadRehman-x9l/shorts",
-    "https://www.youtube.com/@BrainrotCappucino-f7i/shorts",
-    "https://www.youtube.com/@ForgottenAmerica-01/shorts",
-    "https://www.youtube.com/@BrainRotDiaries-A/shorts",
-    "https://www.youtube.com/@BrainRotCore-s9c/shorts",
-    "https://www.youtube.com/@BrainRotEngine-k6z/shorts",
-    "https://www.youtube.com/@BrainRotFramework/shorts",
-    "https://www.youtube.com/@CuteCatDance-u7t/shorts",
-    "https://www.youtube.com/@BrainrotCrocodilo/shorts",
-    "https://www.youtube.com/@BrainrotBlue/shorts",
-    "https://www.youtube.com/@ForgottenAmerica-01/videos",
-    "https://www.youtube.com/@BrainRotKnowledge-s9s/shorts"
+    "https://www.youtube.com/@AmitVichaar/videos",
+    "https://www.youtube.com/@MehulInsights/videos",
+    "https://www.youtube.com/@AdityaThoughtss/videos",
+    "https://www.youtube.com/@SwapnilLearn/videos",
+    "https://www.youtube.com/@AmanThoughts/videos",
+    "https://www.youtube.com/@DeepaakSpeaks/videos",
+    "https://www.youtube.com/@RitwikWrites/videos",
+    "https://www.youtube.com/@AnupamThoughts/videos",
+    "https://www.youtube.com/@KannanGyaanam/videos",
+    "https://www.youtube.com/@MadhanInsights/videos",
+    "https://www.youtube.com/@SenthilLearn/videos",
+    "https://www.youtube.com/@BalaPravah/videos",
+    "https://www.youtube.com/@KiranThoughtss/videos",
+    "https://www.youtube.com/@SrikanthSaar/videos",
+    "https://www.youtube.com/@RohithLearn/videos",
+    "https://www.youtube.com/@VekantInsights/videos"
 ]
 
 def get_headers():
