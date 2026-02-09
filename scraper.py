@@ -31,7 +31,7 @@ CHANNELS = [
     "https://www.youtube.com/@SanaThink/videos",
     "https://www.youtube.com/@AnayaLearn/videos",
     "https://www.youtube.com/@MariamInsight/videos",
-    "https://www.youtube.com/@EmanKnowledgee/videos",
+    "https://www.youtube.com/@EmaanKnowledgee/videos",
     "https://www.youtube.com/@AmnaLearn/videos",
     "https://www.youtube.com/@AmitVichaar/videos"
 ]
