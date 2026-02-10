@@ -15,15 +15,11 @@ MAX_VIDEOS_PER_CHANNEL = 100
 
 # Your channel URLs
 CHANNELS = [
-    "https://www.youtube.com/@AhmedInsightss/videos",
-    "https://www.youtube.com/@AlishaKnowledgee/videos",
     "https://www.youtube.com/@HassanThinks/videos",
     "https://www.youtube.com/@UsmanLearns/videos",
     "https://www.youtube.com/@BilalIdeaas/videos",
-    "https://www.youtube.com/@FahadMinds/videos",
     "https://www.youtube.com/@AyeshaInsights/videos",
     "https://www.youtube.com/@FatimaKnowledgee/videos",
-    "https://www.youtube.com/@ZaraThink/videos",
     "https://www.youtube.com/@HiraLearns/videos",
     "https://www.youtube.com/@NoorThoughtss/videos",
     "https://www.youtube.com/@AimanInsightss/videos",
@@ -31,9 +27,13 @@ CHANNELS = [
     "https://www.youtube.com/@SanaThink/videos",
     "https://www.youtube.com/@AnayaLearn/videos",
     "https://www.youtube.com/@MariamInsight/videos",
-    "https://www.youtube.com/@EmaanKnowledgee/videos",
+    "https://www.youtube.com/@EmanKnowledgee/videos",
     "https://www.youtube.com/@AmnaLearn/videos",
-    "https://www.youtube.com/@AmitVichaar/videos"
+    "https://www.youtube.com/@AmitVichaar/videos",
+    "https://www.youtube.com/@AhmedInsightss/videos",
+    "https://www.youtube.com/@AlishaKnowledgee/videos",
+    "https://www.youtube.com/@ZaraThink/videos",
+    "https://www.youtube.com/@FahadMinds/videos"
 ]
 def get_headers():
     return {
