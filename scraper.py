@@ -33,7 +33,8 @@ CHANNELS = [
     "https://www.youtube.com/@AhmedInsightss/videos",
     "https://www.youtube.com/@AlishaKnowledgee/videos",
     "https://www.youtube.com/@ZaraThink/videos",
-    "https://www.youtube.com/@FahadMinds/videos"
+    "https://www.youtube.com/@FahadMinds/videos",
+    "https://www.youtube.com/@DramaManiia/videos"
 ]
 def get_headers():
     return {
