@@ -34,7 +34,13 @@ CHANNELS = [
     "https://www.youtube.com/@AlishaKnowledgee/videos",
     "https://www.youtube.com/@ZaraThink/videos",
     "https://www.youtube.com/@FahadMinds/videos",
-    "https://www.youtube.com/@DramaManiia/videos"
+    "https://www.youtube.com/@DramaManiia/videos",
+    "https://www.youtube.com/@DramaDiariese/videos",
+    "https://www.youtube.com/@DramaChronicless/videos",
+    "https://www.youtube.com/@DramaSecretsss/videos",
+    "https://www.youtube.com/@DramaSpotliight/videos",
+    "https://www.youtube.com/@DramaCraazee/videos",
+    "https://www.youtube.com/@DramaCenntrall/videos"
 ]
 def get_headers():
     return {
