@@ -16,23 +16,13 @@ MAX_VIDEOS_PER_CHANNEL = 100
 # Your channel URLs
 CHANNELS = [
 
-    "https://www.youtube.com/@DramaManiia/videos",
-    "https://www.youtube.com/@DramaDiariese/videos",
-    "https://www.youtube.com/@DramaChronicleess/videos",
-    "https://www.youtube.com/@DramaSecretsss/videos",
-    "https://www.youtube.com/@DramaSpotlighhtt/videos",
-    "https://www.youtube.com/@DramaaCraazee/videos",
-    "https://www.youtube.com/@DramaCenntrall/videos",
-    "https://www.youtube.com/@SenthilLearn/videos",
-    "https://www.youtube.com/@AnupamThoughts/videos",
-    "https://www.youtube.com/@KannanGyaanam/videos",
+
     "https://www.youtube.com/@HadiReflectss/videos",
     "https://www.youtube.com/@BilalBreakdowns-m4g/videos",
     "https://www.youtube.com/@HamidHighlightz/videos",
-    "https://www.youtube.com/@AhmadInsightss/videos",
     "https://www.youtube.com/@SaifStoriez/videos",
-    "https://www.youtube.com/@ShadowDramaReviews/videos",
-    "https://www.youtube.com/@PrimeDramaReviewz/videos"
+    "https://www.youtube.com/@PrimeDramaReviewz/videos",
+    "https://www.youtube.com/@MidnightRecapz/videos"
 ]
 def get_headers():
     return {
