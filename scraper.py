@@ -21,7 +21,7 @@ CHANNELS = [
     "https://www.youtube.com/@BilalBreakdowns-m4g/videos",
     "https://www.youtube.com/@HamidHighlightz/videos",
     "https://www.youtube.com/@SaifStoriez/videos",
-    "https://www.youtube.com/@PrimeDramaReviewz/videos",
+    "https://www.youtube.com/@CrimsonDramaReviewz/videos",
     "https://www.youtube.com/@MidnightRecapz/videos"
 ]
 def get_headers():
