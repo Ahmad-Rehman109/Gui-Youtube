@@ -28,7 +28,20 @@ CHANNELS = [
     "https://www.youtube.com/@AliDramaWorld",
     "https://www.youtube.com/@Ibrahimms.11",
     "https://www.youtube.com/@HuzaifaDessk",
-    "https://www.youtube.com/@MinhaNotess"
+    "https://www.youtube.com/@MinhaNotess",
+
+    "https://youtube.com/@shayanstudioo?si=dGNdgPDy4wOrmOSe",
+    "https://youtube.com/@farahpoints?si=XAA0d5fiT5gaSEaP",
+    "https://youtube.com/@danialnotes?si=r0fkU5dv96RfTAfx",
+    "https://youtube.com/@tallatnotess?si=qVqpW13SLb80DBap",
+    "https://youtube.com/@fahadfeatures?si=WdIRmK57VyPbPAlB",
+    "https://youtube.com/@zeeshandeskk?si=JVqnAaeD3XfKPmyE",
+    "https://youtube.com/@nomannotes?si=o0AqWqAOVJzBhXyn",
+    "https://youtube.com/@soniaspeakss?si=U4yIh_ekOiWanqyp",
+    "https://youtube.com/@kamranclipss?si=Fu1b8jJniMpP6sdG",
+    "https://youtube.com/@draamaviral?si=eGEyHZzeElGpcpus",
+    "https://youtube.com/@maheenmuses?si=DXrFed_f2-HOqRqI",
+    "https://youtube.com/@yasirdiaryy?si=ASADEmomtKdflcUO"
 ]
 def get_headers():
     return {
