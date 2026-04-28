@@ -1,11 +1,7 @@
 name: Scrape and Deploy
 
 on:
-  schedule:
-    - cron: '0 */4 * * *'
-
-  
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch: # Manual trigger only
 
 jobs:
   scrape-and-deploy:
@@ -15,29 +11,24 @@ jobs:
       deployments: write
     
     steps:
-    # Step 1: Checkout repository
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0  # Fetch all history for proper git operations
+        fetch-depth: 0
       
-    # Step 2: Set up Python for scraping
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
         
-    # Step 3: Install Python dependencies
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install requests aiohttp
         
-    # Step 4: Run scraper
     - name: Run YouTube scraper
       run: python scraper.py
       
-    # Step 5: Commit and push updated data
     - name: Commit and push changes
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
@@ -47,31 +38,26 @@ jobs:
         commit_user_email: github-actions[bot]@users.noreply.github.com
         commit_author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
       
-    # Step 6: Set up Node.js for building
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
           
-    # Step 7: Install Node dependencies
     - name: Install Node dependencies
       run: npm install
         
-    # Step 8: Build React app
     - name: Build React app
       run: npm run build
         
-    # Step 9: Deploy to Cloudflare Pages
     - name: Deploy to Cloudflare Pages
       uses: cloudflare/pages-action@v1
       with:
         apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        projectName: youtube-stats-dashboard  # Change this to your existing project name
+        projectName: youtube-stats-dashboard
         directory: dist
         gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           
-    # Step 10: Success summary
     - name: Deployment Summary
       run: |
         echo "✅ Scraping completed"
